@@ -34,6 +34,9 @@
     ]
   },
   "dependencies": {
+    "@octokit/rest": "^16.33.1",
+    "lodash.debounce": "^4.0.8",
+    "lodash.truncate": "^4.4.2",
     "next": "^9.1.1",
     "react": "^16.10.2",
     "react-dom": "^16.10.2"
