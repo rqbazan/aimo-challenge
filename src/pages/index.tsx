@@ -1,5 +1,5 @@
 import React from 'react'
 
-export default () => {
-  return <div>lalal</div>
+export default function IndexPage() {
+  return <span>Hello World</span>
 }
