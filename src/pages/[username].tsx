@@ -17,6 +17,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
           <Avatar
             src={profile.avatarUrl}
             className="h-20 w-20 border border-gray-500 rounded-sm mr-4"
+            style={{ minWidth: '5rem' }}
             alt={profile.name}
           />
           <div>
