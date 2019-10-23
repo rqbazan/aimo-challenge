@@ -1,8 +1,9 @@
-import 'react-lazy-load-image-component/src/effects/opacity.css'
 import React from 'react'
 import truncate from 'lodash.truncate'
-import { LazyLoadImage } from 'react-lazy-load-image-component'
+import Avatar from './avatar'
 import { UserSummary } from '../types'
+
+// TODO: add lazy loading for images
 
 function UserCard({ avatarUrl, username, id }: UserSummary) {
   return (
@@ -10,12 +11,12 @@ function UserCard({ avatarUrl, username, id }: UserSummary) {
       id={id}
       className="bg-white flex flex-col justify-center items-center py-6 shadow-md cursor-pointer"
     >
-      <LazyLoadImage
+      <Avatar
         src={avatarUrl}
         alt={username}
+        style={{ minHeight: 56 }}
         height={56}
         width={56}
-        effect="opacity"
         className="rounded-full border-gray-200 border"
       />
       <figcaption className="inline-block text-gray-900 text-xs mt-4">

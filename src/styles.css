@@ -1,6 +1,8 @@
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* purgecss start ignore */
+@tailwind base;
 
 body {
   @apply bg-gray-300;
@@ -14,3 +16,13 @@ a {
   @apply font-bold;
   text-decoration: underline;
 }
+
+img {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+img[data-src] {
+  opacity: 0;
+}
+/* purgecss end ignore */
