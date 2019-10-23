@@ -23,16 +23,26 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
               <span className="inline-block font-extrabold leading-tight text-2xl">
                 {profile.name}
               </span>
-              <span className="inline-block text-sm mt-1">{`@${profile.username}`}</span>
+              <span className="inline-block text-sm mt-1">
+                <a
+                  href={`http://github.com/${profile.username}`}
+                >{`@${profile.username}`}</a>
+              </span>
             </h1>
           </div>
         </div>
-        <div className="mt-4 text-xs">
+        <div className="mt-5 text-xs">
           <p>{profile.bio}</p>
           <ul className="mt-2">
-            <li>{profile.company}</li>
-            <li>{profile.location}</li>
-            <li>
+            <li className="mb-2">
+              <span className="font-bold">company: </span>
+              <span>{profile.company || 'N/A'}</span>
+            </li>
+            <li className="mb-2">
+              <span className="font-bold">location: </span>
+              <span>{profile.location || 'N/A'}</span>
+            </li>
+            <li className="mb-2">
               <a href={`mailto:${profile.email}`}>{profile.email}</a>
             </li>
             <li>
