@@ -1,19 +1,27 @@
+import 'react-lazy-load-image-component/src/effects/opacity.css'
 import React from 'react'
 import truncate from 'lodash.truncate'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { User } from '../types'
 
-function UserCard(props: User) {
+function UserCard({ avatarUrl, nickname, id }: User) {
   return (
-    <div className="h-32 w-full bg-white flex flex-col rounded-lg justify-center items-center">
-      <img
-        src={props.avatarUrl}
-        alt={props.nickname}
-        className="rounded-full w-12 h-12 mb-2"
+    <figure
+      id={id}
+      className="bg-white flex flex-col justify-center items-center py-6 shadow-md"
+    >
+      <LazyLoadImage
+        src={avatarUrl}
+        alt={nickname}
+        height={56}
+        width={56}
+        effect="opacity"
+        className="rounded-full border-gray-200 border"
       />
-      <span className="inline-block text-xs font-mono uppercase">
-        {truncate(props.nickname, { length: 10 })}
-      </span>
-    </div>
+      <figcaption className="inline-block text-gray-900 text-xs mt-4">
+        {`@${truncate(nickname, { length: 10 })}`}
+      </figcaption>
+    </figure>
   )
 }
 

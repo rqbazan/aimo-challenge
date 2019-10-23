@@ -11,7 +11,8 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --ext ts,tsx"
+    "lint": "eslint --ext ts,tsx",
+    "typecheck": "tsc --noEmit"
   },
   "husky": {
     "hooks": {
@@ -36,15 +37,23 @@
   "dependencies": {
     "@octokit/rest": "^16.33.1",
     "lodash.debounce": "^4.0.8",
+    "lodash.get": "^4.4.2",
     "lodash.truncate": "^4.4.2",
     "next": "^9.1.1",
+    "parse-link-header": "^1.0.1",
     "react": "^16.10.2",
-    "react-dom": "^16.10.2"
+    "react-dom": "^16.10.2",
+    "react-infinite-scroller": "^1.2.4",
+    "react-lazy-load-image-component": "^1.3.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",
     "@commitlint/config-conventional": "^8.2.0",
+    "@types/lodash.debounce": "^4.0.6",
+    "@types/lodash.get": "^4.4.6",
+    "@types/lodash.truncate": "^4.4.6",
     "@types/node": "^12.11.2",
+    "@types/parse-link-header": "^1.0.0",
     "@types/react": "^16.9.9",
     "@zeit/next-css": "^1.0.1",
     "autoprefixer": "^9.6.5",

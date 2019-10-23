@@ -1,13 +1,13 @@
 export interface User {
-  key: string
+  id: string
   nickname: string
   avatarUrl: string
 }
 
 export interface PageInfo {
   totalCount: number
-  nextPageUrl?: string
-  prevPageUrl?: string
+  nextPage?: number
+  prevPage?: number
 }
 
 export interface ApiResult<T> {
@@ -15,6 +15,11 @@ export interface ApiResult<T> {
   pageInfo: PageInfo
 }
 
+export interface Query {
+  term: string
+  page: number
+}
+
 export interface GithubUserApi {
-  findAll(query: string): Promise<ApiResult<User[]>>
+  findAll(query: Query): Promise<ApiResult<User[]>>
 }
