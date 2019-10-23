@@ -25,4 +25,18 @@ img {
 img[data-src] {
   opacity: 0;
 }
+
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  @apply bg-purple-500;
+  @apply z-50;
+  height: 3px;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
 /* purgecss end ignore */
