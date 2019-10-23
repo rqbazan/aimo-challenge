@@ -1,6 +1,7 @@
 import 'isomorphic-unfetch'
 import React from 'react'
 import { NextPageContext } from 'next'
+import Avatar from '../components/avatar'
 import GithubUser from '../github'
 import { UserProfile } from '../types'
 
@@ -13,7 +14,7 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
     <div className="flex m-auto max-w-full md:max-w-2xl h-screen">
       <div className="flex flex-col p-4 self-center">
         <div className="flex">
-          <img
+          <Avatar
             src={profile.avatarUrl}
             className="h-20 w-20 border border-gray-500 rounded-sm mr-4"
             alt={profile.name}
