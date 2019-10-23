@@ -8,6 +8,8 @@ import {
   UserProfile
 } from './types'
 
+// TODO: implement caching
+
 function getPageInfo<T extends { total_count: number }>(
   response: Octokit.Response<T>
 ): PageInfo {
@@ -49,6 +51,8 @@ class GithubUserApiImpl implements GithubUserApi {
   }
 
   async findAll(query: Query): Promise<SearchResult> {
+    // FIXME: duplicated items in two successive pages
+
     const response = await this.octokit.search.users({
       q: query.term,
       page: query.page,

@@ -1,79 +1,69 @@
 import React from 'react'
+import { NextPageContext } from 'next'
 import Head from 'next/head'
+import Router from 'next/router'
 import debounce from 'lodash.debounce'
 import get from 'lodash.get'
-import InfiniteScroller from 'react-infinite-scroller'
+import uniqBy from 'lodash.uniqby'
 import Users from '../components/users'
-import Loader from '../components/loader'
+import SearchBar from '../components/search-bar'
 import { SearchResult, Query } from '../types'
 import GithubUser from '../github'
 
+const actionTypes = {
+  SEARCHING: 0,
+  FAILED: 1,
+  SEARCHED: 2,
+  REFETCHED: 3
+}
+
 interface IndexPageState {
   isSearching: boolean
-  query: Query
   searchResult?: SearchResult
 }
 
-const actionTypes = {
-  SEARCHING: 0,
-  SCROLLING: 1,
-  CLEANED: 2,
-  FAILED: 3,
-  SEARCHED: 4,
-  REFETCHED: 5
+interface IndexPageProps {
+  isSearching: boolean
+  term?: string
 }
 
-const initialState: IndexPageState = {
-  isSearching: false,
-  query: {
-    term: '',
-    page: 1
-  }
-}
+type ActionType = keyof typeof actionTypes
 
-function reducer(
-  state: IndexPageState,
-  action: { type: keyof typeof actionTypes; payload?: any }
-): IndexPageState {
-  const { type, payload } = action
+type Action = [ActionType, any?]
+
+function reducer(state: IndexPageState, action: Action): IndexPageState {
+  const [type, payload] = action
 
   switch (type) {
     case 'SEARCHING': {
       return {
-        isSearching: true,
-        query: {
-          page: 1,
-          term: payload
-        }
+        isSearching: true
       }
     }
     case 'SEARCHED': {
       return {
         isSearching: false,
-        query: state.query,
         searchResult: payload
       }
     }
     case 'REFETCHED': {
-      const prevUsers = get(state, 'searchResult.data', [])
+      const { data: newUsers } = payload
+      const prevUsers = get(state.searchResult, 'data', [])
+      // TODO: remove if github client was fixed
+      const data = uniqBy(prevUsers.concat(newUsers), 'id')
 
       return {
         isSearching: false,
-        query: state.query,
         searchResult: {
-          pageInfo: payload.pageInfo,
-          data: prevUsers.concat(payload.data)
+          data,
+          pageInfo: payload.pageInfo
         }
       }
     }
     case 'FAILED': {
       return {
-        isSearching: false,
-        query: state.query
+        isSearching: false
       }
-    }
-    case 'CLEANED': {
-      return initialState
     }
     default: {
       return state
@@ -81,97 +71,84 @@ function reducer(
   }
 }
 
-function useSearchState() {
-  const [state, dispatch] = React.useReducer(reducer, initialState)
-
-  const search = React.useCallback(
-    debounce(async (term: string) => {
-      try {
-        const result = await GithubUser.findAll({ term, page: 1 })
-        dispatch({ type: 'SEARCHED', payload: result })
-      } catch (error) {
-        dispatch({ type: 'FAILED', payload: error })
-      }
-    }, 500),
-    []
-  )
+function useSearchState({ term, isSearching }: IndexPageProps) {
+  const [state, dispatch] = React.useReducer(reducer, {
+    isSearching
+  })
 
   const refetch = React.useCallback(
     debounce(async (query: Query) => {
       try {
         const result = await GithubUser.findAll(query)
-        dispatch({ type: 'REFETCHED', payload: result })
+        dispatch(['REFETCHED', result])
       } catch (error) {
-        dispatch({ type: 'FAILED', payload: error })
+        dispatch(['FAILED'])
       }
     }, 500),
     []
   )
 
-  return { state, search, refetch, dispatch }
+  React.useEffect(() => {
+    if (!term) {
+      return
+    }
+
+    dispatch(['SEARCHING'])
+
+    GithubUser.findAll({ term, page: 1 }).then(
+      (result: SearchResult) => {
+        dispatch(['SEARCHED', result])
+      },
+      () => {
+        dispatch(['FAILED'])
+      }
+    )
+  }, [term])
+
+  return { state, refetch }
 }
 
-export default function IndexPage() {
-  const { state, search, refetch, dispatch } = useSearchState()
-  const { query, isSearching, searchResult } = state
-
-  function onSearch(e: React.ChangeEvent<HTMLInputElement>) {
-    const { value: inputValue } = e.target
-
-    if (inputValue) {
-      dispatch({ type: 'SEARCHING', payload: inputValue })
-      search(inputValue)
-    } else {
-      dispatch({ type: 'CLEANED' })
-      search.cancel()
-      refetch.cancel()
-    }
-  }
-
-  function onScroll() {
-    const nextPage = get(searchResult, 'pageInfo.nextPage')
-
-    if (query.term && nextPage) {
-      refetch({ ...query, page: nextPage })
-    }
-  }
+export default function IndexPage({ term, isSearching }: IndexPageProps) {
+  const { state, refetch } = useSearchState({ term, isSearching })
 
   return (
     <>
       <Head>
         <title>AIMO Challenge</title>
       </Head>
-      <header className="flex-col items-center bg-purple-200 fixed w-full shadow-md p-4 z-10">
+      <header className="bg-purple-200 fixed w-full shadow-md p-4 z-10">
         <h1 className="text-xl mb-2">Github Users</h1>
         <div className="flex flex-col">
-          <input
-            value={query.term}
-            onChange={onSearch}
-            className="bg-white focus:outline-none border border-indigo-200 focus:border-indigo-800 py-2 px-4 w-full appearance-none"
-            placeholder="Search by username"
+          <SearchBar
+            defaultValue={term}
+            onChange={q => q && Router.push(`/?q=${q}`)}
           />
           <span className="text-xs mt-2">
-            {get(searchResult, 'pageInfo.totalCount', 0)} results
+            {get(state, 'searchResult.pageInfo.totalCount', 0)} results
           </span>
         </div>
       </header>
-      <InfiniteScroller
-        pageStart={1}
-        loadMore={onScroll}
-        hasMore={!!get(searchResult, 'pageInfo.nextPage')}
-        loader={
-          <div key="loader" className="flex mb-4 mt-2">
-            <Loader />
-          </div>
-        }
-      >
-        <div className="flex flex-wrap mx-2 pt-40">
-          <Users
-            isLoading={isSearching}
-            dataSource={get(searchResult, 'data')}
-          />
-        </div>
-      </InfiniteScroller>
+      <Users
+        className="flex flex-wrap mx-2 pt-40"
+        isLoading={state.isSearching}
+        searchResult={state.searchResult}
+        onScroll={page => term && refetch({ term, page })}
+      />
     </>
   )
+}
+
+IndexPage.getInitialProps = async (
+  ctx: NextPageContext
+): Promise<IndexPageProps> => {
+  if (!ctx.query.q) {
+    return {
+      isSearching: false
+    }
+  }
+
+  return {
+    term: ctx.query.q as string,
+    isSearching: true
+  }
 }
