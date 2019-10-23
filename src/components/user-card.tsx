@@ -4,22 +4,19 @@ import truncate from 'lodash.truncate'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import { User } from '../types'
 
-function UserCard({ avatarUrl, nickname, id }: User) {
+function UserCard({ avatarUrl, username }: User) {
   return (
-    <figure
-      id={id}
-      className="bg-white flex flex-col justify-center items-center py-6 shadow-md"
-    >
+    <figure className="bg-white flex flex-col justify-center items-center py-6 shadow-md cursor-pointer">
       <LazyLoadImage
         src={avatarUrl}
-        alt={nickname}
+        alt={username}
         height={56}
         width={56}
         effect="opacity"
         className="rounded-full border-gray-200 border"
       />
       <figcaption className="inline-block text-gray-900 text-xs mt-4">
-        {`@${truncate(nickname, { length: 10 })}`}
+        {`@${truncate(username, { length: 10 })}`}
       </figcaption>
     </figure>
   )

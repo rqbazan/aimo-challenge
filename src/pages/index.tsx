@@ -1,16 +1,17 @@
 import React from 'react'
+import Head from 'next/head'
 import debounce from 'lodash.debounce'
 import get from 'lodash.get'
 import InfiniteScroller from 'react-infinite-scroller'
 import Users from '../components/users'
 import Loader from '../components/loader'
-import { User, ApiResult, Query } from '../types'
+import { SearchResult, Query } from '../types'
 import GithubUser from '../github'
 
 interface IndexPageState {
   isSearching: boolean
   query: Query
-  searchResult?: ApiResult<User[]>
+  searchResult?: SearchResult
 }
 
 const actionTypes = {
@@ -137,6 +138,9 @@ export default function IndexPage() {
 
   return (
     <>
+      <Head>
+        <title>AIMO Challenge</title>
+      </Head>
       <header className="flex-col items-center bg-purple-200 fixed w-full shadow-md p-4 z-10">
         <h1 className="text-xl mb-2">Github Users</h1>
         <div className="flex flex-col">

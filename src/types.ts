@@ -1,7 +1,19 @@
 export interface User {
   id: string
-  nickname: string
+  username: string
   avatarUrl: string
+}
+
+export interface UserProfile extends User {
+  bio: string
+  name: string
+  company: string
+  blog: string
+  location: string
+  email: string
+  followers: number
+  following: number
+  createdAt: string
 }
 
 export interface PageInfo {
@@ -10,8 +22,8 @@ export interface PageInfo {
   prevPage?: number
 }
 
-export interface ApiResult<T> {
-  data: T
+export interface SearchResult {
+  data: User[]
   pageInfo: PageInfo
 }
 
@@ -21,5 +33,6 @@ export interface Query {
 }
 
 export interface GithubUserApi {
-  findAll(query: Query): Promise<ApiResult<User[]>>
+  findAll(query: Query): Promise<SearchResult>
+  getByUsername(username: string): Promise<UserProfile>
 }

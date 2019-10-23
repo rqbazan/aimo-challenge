@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import UserCard from './user-card'
 import Loader from './loader'
 import { User } from '../types'
@@ -23,13 +24,15 @@ export default function Users({ isLoading, dataSource }: UsersProps) {
   return (
     <>
       {dataSource.map(user => (
-        <div key={user.id} className="w-1/3 md:w-1/4 lg:w-1/6 mb-3 px-2">
-          <UserCard
-            id={user.id}
-            nickname={user.nickname}
-            avatarUrl={user.avatarUrl}
-          />
-        </div>
+        <Link key={user.id} href="/[username]" as={`/${user.username}`}>
+          <div className="w-1/3 md:w-1/4 lg:w-1/6 mb-3 px-2">
+            <UserCard
+              id={user.id}
+              username={user.username}
+              avatarUrl={user.avatarUrl}
+            />
+          </div>
+        </Link>
       ))}
     </>
   )

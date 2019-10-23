@@ -1,6 +1,13 @@
 import Octokit from '@octokit/rest'
 import parseLinkHeader from 'parse-link-header'
-import { GithubUserApi, User, ApiResult, PageInfo, Query } from './types'
+import {
+  GithubUserApi,
+  User,
+  SearchResult,
+  PageInfo,
+  Query,
+  UserProfile
+} from './types'
 
 function getPageInfo<T extends { total_count: number }>(
   response: Octokit.Response<T>
@@ -42,7 +49,7 @@ class GithubUserApiImpl implements GithubUserApi {
     return instance
   }
 
-  async findAll(query: Query): Promise<ApiResult<User[]>> {
+  async findAll(query: Query): Promise<SearchResult> {
     const response = await this.octokit.search.users({
       q: query.term,
       page: query.page,
@@ -53,10 +60,31 @@ class GithubUserApiImpl implements GithubUserApi {
     return {
       data: response.data.items.map(item => ({
         id: item.node_id,
-        nickname: item.login,
+        username: item.login,
         avatarUrl: item.avatar_url
       })),
       pageInfo: getPageInfo(response)
+    }
+  }
+
+  async getByUsername(username: string): Promise<UserProfile> {
+    const { data } = await this.octokit.users.getByUsername({
+      username
+    })
+
+    return {
+      id: data.node_id,
+      username: data.login,
+      avatarUrl: data.avatar_url,
+      bio: data.bio,
+      name: data.name,
+      company: data.company,
+      blog: data.blog,
+      location: data.location,
+      email: data.email,
+      followers: data.followers,
+      following: data.following,
+      createdAt: data.created_at
     }
   }
 }
