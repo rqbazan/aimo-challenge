@@ -1,19 +1,34 @@
 import React from 'react'
 
+function useImgState(src?: string) {
+  const [dataSrc, setDataSrc] = React.useState(src)
+
+  function ref(image: HTMLImageElement | null) {
+    if (!image) {
+      return
+    }
+
+    const removeDataSrcAttribute = () => {
+      setDataSrc(undefined)
+    }
+
+    // eslint-disable-next-line no-param-reassign
+    image.onload = removeDataSrcAttribute
+
+    if (image.complete && dataSrc) {
+      removeDataSrcAttribute()
+    }
+  }
+
+  return { dataSrc, ref }
+}
+
 export default function Avatar({
   src,
   alt,
   ...props
 }: React.ImgHTMLAttributes<HTMLImageElement>) {
-  const [dataSrc, setDataSrc] = React.useState(src)
+  const { dataSrc, ref } = useImgState(src)
 
-  return (
-    <img
-      {...props}
-      src={src}
-      alt={alt}
-      data-src={dataSrc}
-      onLoad={() => setDataSrc(undefined)}
-    />
-  )
+  return <img {...props} ref={ref} src={src} alt={alt} data-src={dataSrc} />
 }
