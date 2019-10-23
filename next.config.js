@@ -7,7 +7,7 @@ module.exports = withCSS(
       swDest: 'static/service-worker.js',
       runtimeCaching: [
         {
-          urlPattern: /.*\.(?:png|jpg|jpeg|svg|gif)/,
+          urlPattern: new RegExp('^https://avatars1.githubusercontent.com'),
           handler: 'CacheFirst',
           options: {
             cacheName: 'image-cache',
