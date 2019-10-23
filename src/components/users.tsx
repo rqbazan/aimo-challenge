@@ -2,14 +2,14 @@ import React from 'react'
 import Link from 'next/link'
 import UserCard from './user-card'
 import Loader from './loader'
-import { User } from '../types'
+import { UserSummary } from '../types'
 
 // TODO: add empty state
 // TODO: add error state
 
 interface UsersProps {
   isLoading: boolean
-  dataSource?: User[]
+  dataSource?: UserSummary[]
 }
 
 export default function Users({ isLoading, dataSource }: UsersProps) {

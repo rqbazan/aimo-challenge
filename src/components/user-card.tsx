@@ -2,9 +2,9 @@ import 'react-lazy-load-image-component/src/effects/opacity.css'
 import React from 'react'
 import truncate from 'lodash.truncate'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
-import { User } from '../types'
+import { UserSummary } from '../types'
 
-function UserCard({ avatarUrl, username }: User) {
+function UserCard({ avatarUrl, username }: UserSummary) {
   return (
     <figure className="bg-white flex flex-col justify-center items-center py-6 shadow-md cursor-pointer">
       <LazyLoadImage

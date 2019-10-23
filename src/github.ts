@@ -2,7 +2,6 @@ import Octokit from '@octokit/rest'
 import parseLinkHeader from 'parse-link-header'
 import {
   GithubUserApi,
-  User,
   SearchResult,
   PageInfo,
   Query,

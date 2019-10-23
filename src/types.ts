@@ -1,10 +1,10 @@
-export interface User {
+export interface UserSummary {
   id: string
   username: string
   avatarUrl: string
 }
 
-export interface UserProfile extends User {
+export interface UserProfile extends UserSummary {
   bio: string
   name: string
   company: string
@@ -23,7 +23,7 @@ export interface PageInfo {
 }
 
 export interface SearchResult {
-  data: User[]
+  data: UserSummary[]
   pageInfo: PageInfo
 }
 
