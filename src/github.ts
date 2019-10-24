@@ -1,32 +1,35 @@
 import Octokit from '@octokit/rest'
+import get from 'lodash.get'
 import parseLinkHeader from 'parse-link-header'
 import {
   GithubUserApi,
   SearchResult,
   PageInfo,
   Query,
-  UserProfile
+  Cancelable
 } from './types'
-
-// TODO: implement caching
 
 function getPageInfo<T extends { total_count: number }>(
   response: Octokit.Response<T>
 ): PageInfo {
-  const pageInfo: PageInfo = {
-    totalCount: response.data.total_count
-  }
-
   const links = parseLinkHeader(response.headers.link)
 
-  if (!links) {
-    return pageInfo
+  return {
+    totalCount: response.data.total_count,
+    nextPage: Number(get(links, 'next.page', 0)),
+    prevPage: Number(get(links, 'next.page', 0))
   }
+}
 
-  pageInfo.nextPage = links.next && Number(links.next.page)
-  pageInfo.prevPage = links.prev && Number(links.prev.page)
+function createCancelable<T>(
+  fn: (controller: AbortController) => Promise<T>
+): Cancelable<T> {
+  const controller = new AbortController()
 
-  return pageInfo
+  return {
+    promise: new Promise((res, rej) => fn(controller).then(res, rej)),
+    cancel: () => controller.abort()
+  }
 }
 
 class GithubUserApiImpl implements GithubUserApi {
@@ -50,45 +53,57 @@ class GithubUserApiImpl implements GithubUserApi {
     return instance
   }
 
-  async findAll(query: Query): Promise<SearchResult> {
-    // FIXME: duplicated items in two successive pages
+  findAll = (query: Query): Cancelable<SearchResult> => {
+    const executor = async (controller: AbortController) => {
+      const response = await this.octokit.search.users({
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        per_page: 10,
+        q: query.term,
+        page: query.page,
+        request: {
+          signal: controller.signal
+        }
+      })
 
-    const response = await this.octokit.search.users({
-      q: query.term,
-      page: query.page,
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      per_page: 10
-    })
-
-    return {
-      data: response.data.items.map(item => ({
-        id: item.node_id,
-        username: item.login,
-        avatarUrl: item.avatar_url
-      })),
-      pageInfo: getPageInfo(response)
+      return {
+        data: response.data.items.map(item => ({
+          id: item.node_id,
+          username: item.login,
+          avatarUrl: item.avatar_url
+        })),
+        pageInfo: getPageInfo(response)
+      }
     }
+
+    return createCancelable(executor)
   }
 
-  async getByUsername(username: string): Promise<UserProfile> {
-    const { data } = await this.octokit.users.getByUsername({
-      username
-    })
+  getByUsername = (username: string) => {
+    const executor = async (controller: AbortController) => {
+      const { data } = await this.octokit.users.getByUsername({
+        username,
+        request: {
+          signal: controller.signal
+        }
+      })
 
-    return {
-      id: data.node_id,
-      username: data.login,
-      avatarUrl: data.avatar_url,
-      bio: data.bio,
-      name: data.name,
-      company: data.company,
-      blog: data.blog,
-      location: data.location,
-      email: data.email,
-      followers: data.followers,
-      following: data.following,
-      createdAt: data.created_at
+      return {
+        id: data.node_id,
+        username: data.login,
+        avatarUrl: data.avatar_url,
+        bio: data.bio,
+        name: data.name,
+        company: data.company,
+        blog: data.blog,
+        location: data.location,
+        email: data.email,
+        followers: data.followers,
+        following: data.following,
+        createdAt: data.created_at
+      }
     }
+
+    return createCancelable(executor)
   }
 }
 

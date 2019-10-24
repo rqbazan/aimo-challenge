@@ -58,7 +58,8 @@ export default function ProfilePage({ profile }: ProfilePageProps) {
 }
 
 ProfilePage.getInitialProps = async (ctx: NextPageContext) => {
-  return {
-    profile: await GithubUser.getByUsername(ctx.query.username as string)
-  }
+  const username = ctx.query.username as string
+  const profile = await GithubUser.getByUsername(username).promise
+
+  return { profile }
 }

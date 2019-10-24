@@ -76,11 +76,13 @@ function useSearchState({ term, isSearching }: IndexPageProps) {
     isSearching
   })
 
+  const searchCancelRef = React.useRef<() => void>()
+
   const refetch = React.useCallback(
     debounce(async (query: Query) => {
       try {
-        const result = await GithubUser.findAll(query)
-        dispatch(['REFETCHED', result])
+        const { promise } = GithubUser.findAll(query)
+        dispatch(['REFETCHED', await promise])
       } catch (error) {
         dispatch(['FAILED'])
       }
@@ -93,16 +95,15 @@ function useSearchState({ term, isSearching }: IndexPageProps) {
       return
     }
 
-    dispatch(['SEARCHING'])
+    if (searchCancelRef.current) {
+      searchCancelRef.current()
+    }
 
-    GithubUser.findAll({ term, page: 1 }).then(
-      (result: SearchResult) => {
-        dispatch(['SEARCHED', result])
-      },
-      () => {
-        dispatch(['FAILED'])
-      }
-    )
+    const { promise, cancel } = GithubUser.findAll({ term, page: 1 })
+    searchCancelRef.current = cancel
+    promise
+      .then((result: SearchResult) => dispatch(['SEARCHED', result]))
+      .catch(() => dispatch(['FAILED']))
   }, [term])
 
   return { state, refetch }
