@@ -36,10 +36,13 @@ function createCancelable<T>(
 class GithubUserApiImpl implements GithubUserApi {
   octokit: Octokit
 
+  cache: { [key: string]: any }
+
   private static instance: GithubUserApi
 
   private constructor(options?: Octokit.Options) {
     this.octokit = new Octokit(options)
+    this.cache = {}
   }
 
   static getInstance(): GithubUserApi {
@@ -52,6 +55,10 @@ class GithubUserApiImpl implements GithubUserApi {
     }
 
     return instance
+  }
+
+  getCacheKey(query: Query): string {
+    return JSON.stringify(query)
   }
 
   findAll = (query: Query): Cancelable<SearchResult> => {
@@ -77,7 +84,17 @@ class GithubUserApiImpl implements GithubUserApi {
       }
     }
 
-    return createCancelable(executor)
+    return createCancelable(async (controller: AbortController) => {
+      const cacheKey = this.getCacheKey(query)
+      let cached = this.cache[cacheKey]
+
+      if (!cached) {
+        cached = await executor(controller)
+        this.cache[cacheKey] = cached
+      }
+
+      return cached
+    })
   }
 
   getByUsername = (username: string): Cancelable<UserProfile> => {
