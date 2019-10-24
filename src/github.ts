@@ -56,6 +56,7 @@ class GithubUserApiImpl implements GithubUserApi {
 
   findAll = (query: Query): Cancelable<SearchResult> => {
     const executor = async (controller: AbortController) => {
+      // FIXME: duplicated items in two successive pages
       const response = await this.octokit.search.users({
         // eslint-disable-next-line @typescript-eslint/camelcase
         per_page: 10,
