@@ -2,7 +2,6 @@ import React from 'react'
 import { NextPageContext } from 'next'
 import Head from 'next/head'
 import Router from 'next/router'
-import debounce from 'lodash.debounce'
 import get from 'lodash.get'
 import uniqBy from 'lodash.uniqby'
 import Users from '../components/users'
@@ -78,17 +77,14 @@ function useSearchState({ term, isSearching }: IndexPageProps) {
 
   const searchCancelRef = React.useRef<() => void>()
 
-  const refetch = React.useCallback(
-    debounce(async (query: Query) => {
-      try {
-        const { promise } = GithubUser.findAll(query)
-        dispatch(['REFETCHED', await promise])
-      } catch (error) {
-        dispatch(['FAILED'])
-      }
-    }, 500),
-    []
-  )
+  async function refetch(query: Query) {
+    try {
+      const { promise } = GithubUser.findAll(query)
+      dispatch(['REFETCHED', await promise])
+    } catch (error) {
+      dispatch(['FAILED'])
+    }
+  }
 
   React.useEffect(() => {
     if (!term) {
