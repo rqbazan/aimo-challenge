@@ -6,7 +6,8 @@ import {
   SearchResult,
   PageInfo,
   Query,
-  Cancelable
+  Cancelable,
+  UserProfile
 } from './types'
 
 function getPageInfo<T extends { total_count: number }>(
@@ -78,7 +79,7 @@ class GithubUserApiImpl implements GithubUserApi {
     return createCancelable(executor)
   }
 
-  getByUsername = (username: string) => {
+  getByUsername = (username: string): Cancelable<UserProfile> => {
     const executor = async (controller: AbortController) => {
       const { data } = await this.octokit.users.getByUsername({
         username,
