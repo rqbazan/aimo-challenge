@@ -6,10 +6,10 @@ interface SearchProps {
   defaultValue?: string
 }
 
-const Search: React.FC<SearchProps> = ({
+export default function SearchBar({
   defaultValue = '',
   onChange: propOnChange
-}) => {
+}: SearchProps) {
   const [value, setValue] = React.useState(defaultValue)
 
   const dispatchOnChange = React.useCallback(
@@ -33,5 +33,3 @@ const Search: React.FC<SearchProps> = ({
     />
   )
 }
-
-export default Search

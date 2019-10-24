@@ -3,8 +3,6 @@ import truncate from 'lodash.truncate'
 import Avatar from './avatar'
 import { UserSummary } from '../types'
 
-// TODO: add lazy loading for images
-
 function UserCard({ avatarUrl, username, id }: UserSummary) {
   return (
     <figure

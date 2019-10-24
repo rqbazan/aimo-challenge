@@ -1,5 +1,7 @@
 import React from 'react'
 
+// TODO: add real lazy loading
+
 function useImgState(src?: string) {
   const [dataSrc, setDataSrc] = React.useState(src)
 
