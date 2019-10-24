@@ -32,7 +32,12 @@ export interface Query {
   page: number
 }
 
+export interface Cancelable<T> {
+  promise: Promise<T>
+  cancel(): void
+}
+
 export interface GithubUserApi {
-  findAll(query: Query): Promise<SearchResult>
-  getByUsername(username: string): Promise<UserProfile>
+  findAll(query: Query): Cancelable<SearchResult>
+  getByUsername(username: string): Cancelable<UserProfile>
 }
