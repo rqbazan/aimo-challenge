@@ -39,5 +39,5 @@ export interface Cancelable<T> {
 
 export interface GithubUserApi {
   findAll(query: Query): Cancelable<SearchResult>
-  getByUsername(username: string): Cancelable<UserProfile>
+  getByUsername(username: string): Promise<UserProfile>
 }

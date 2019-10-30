@@ -18,7 +18,7 @@ function getPageInfo<T extends { total_count: number }>(
   return {
     totalCount: response.data.total_count,
     nextPage: Number(get(links, 'next.page', 0)),
-    prevPage: Number(get(links, 'next.page', 0))
+    prevPage: Number(get(links, 'prev.page', 0))
   }
 }
 
@@ -36,13 +36,13 @@ function createCancelable<T>(
 class GithubUserApiImpl implements GithubUserApi {
   octokit: Octokit
 
-  cache: { [key: string]: any }
+  inMemoryCache: { [key: string]: any }
 
   private static instance: GithubUserApi
 
   private constructor(options?: Octokit.Options) {
     this.octokit = new Octokit(options)
-    this.cache = {}
+    this.inMemoryCache = {}
   }
 
   static getInstance(): GithubUserApi {
@@ -86,43 +86,36 @@ class GithubUserApiImpl implements GithubUserApi {
 
     return createCancelable(async (controller: AbortController) => {
       const cacheKey = this.getCacheKey(query)
-      let cached = this.cache[cacheKey]
+      let cached = this.inMemoryCache[cacheKey]
 
       if (!cached) {
         cached = await executor(controller)
-        this.cache[cacheKey] = cached
+        this.inMemoryCache[cacheKey] = cached
       }
 
       return cached
     })
   }
 
-  getByUsername = (username: string): Cancelable<UserProfile> => {
-    const executor = async (controller: AbortController) => {
-      const { data } = await this.octokit.users.getByUsername({
-        username,
-        request: {
-          signal: controller.signal
-        }
-      })
+  getByUsername = async (username: string): Promise<UserProfile> => {
+    const { data } = await this.octokit.users.getByUsername({
+      username
+    })
 
-      return {
-        id: data.node_id,
-        username: data.login,
-        avatarUrl: data.avatar_url,
-        bio: data.bio,
-        name: data.name,
-        company: data.company,
-        blog: data.blog,
-        location: data.location,
-        email: data.email,
-        followers: data.followers,
-        following: data.following,
-        createdAt: data.created_at
-      }
+    return {
+      id: data.node_id,
+      username: data.login,
+      avatarUrl: data.avatar_url,
+      bio: data.bio,
+      name: data.name,
+      company: data.company,
+      blog: data.blog,
+      location: data.location,
+      email: data.email,
+      followers: data.followers,
+      following: data.following,
+      createdAt: data.created_at
     }
-
-    return createCancelable(executor)
   }
 }
 

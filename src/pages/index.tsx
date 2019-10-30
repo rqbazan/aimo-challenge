@@ -96,7 +96,10 @@ function useSearchState({ term, isSearching }: IndexPageProps) {
     }
 
     const { promise, cancel } = GithubUser.findAll({ term, page: 1 })
+
     searchCancelRef.current = cancel
+
+    dispatch(['SEARCHING'])
     promise
       .then((result: SearchResult) => dispatch(['SEARCHED', result]))
       .catch(() => dispatch(['FAILED']))
