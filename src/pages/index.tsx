@@ -2,12 +2,18 @@ import React from 'react'
 import { NextPageContext } from 'next'
 import Head from 'next/head'
 import Router from 'next/router'
+import dynamic from 'next/dynamic'
 import get from 'lodash.get'
 import uniqBy from 'lodash.uniqby'
-import Users from '../components/users'
-import SearchBar from '../components/search-bar'
+import { HookError } from '@octokit/rest'
+import { Users, SearchBar } from '../components'
 import { SearchResult, Query } from '../types'
 import GithubUser from '../github'
+import config from '../config'
+
+const Auth = dynamic(() => import('../components/auth'), {
+  ssr: false
+})
 
 const actionTypes = {
   SEARCHING: 0,
@@ -19,6 +25,7 @@ const actionTypes = {
 interface IndexPageState {
   isSearching: boolean
   searchResult?: SearchResult
+  error?: HookError
 }
 
 interface IndexPageProps {
@@ -61,7 +68,8 @@ function reducer(state: IndexPageState, action: Action): IndexPageState {
     }
     case 'FAILED': {
       return {
-        isSearching: false
+        isSearching: false,
+        error: payload
       }
     }
     default: {
@@ -75,34 +83,28 @@ function useSearchState({ term, isSearching }: IndexPageProps) {
     isSearching
   })
 
-  const searchCancelRef = React.useRef<() => void>()
-
   async function refetch(query: Query) {
     try {
       const { promise } = GithubUser.findAll(query)
       dispatch(['REFETCHED', await promise])
     } catch (error) {
-      dispatch(['FAILED'])
+      dispatch(['FAILED', error])
     }
   }
 
   React.useEffect(() => {
     if (!term) {
-      return
-    }
-
-    if (searchCancelRef.current) {
-      searchCancelRef.current()
+      return undefined
     }
 
     const { promise, cancel } = GithubUser.findAll({ term, page: 1 })
 
-    searchCancelRef.current = cancel
-
     dispatch(['SEARCHING'])
     promise
       .then((result: SearchResult) => dispatch(['SEARCHED', result]))
-      .catch(() => dispatch(['FAILED']))
+      .catch(error => dispatch(['FAILED', error]))
+
+    return cancel
   }, [term])
 
   return { state, refetch }
@@ -127,13 +129,18 @@ export default function IndexPage({ term, isSearching }: IndexPageProps) {
             {get(state, 'searchResult.pageInfo.totalCount', 0)} results
           </span>
         </div>
+        <div className="absolute top-0 right-0 mt-6 mr-4 text-sm">
+          <Auth githubClientId={config.GITHUB_CLIENT_ID} />
+        </div>
       </header>
-      <Users
-        className="flex flex-wrap mx-2 pt-40"
-        isLoading={state.isSearching}
-        searchResult={state.searchResult}
-        onScroll={page => term && refetch({ term, page })}
-      />
+      <div className="flex flex-wrap mx-2 pt-40">
+        <Users
+          isLoading={state.isSearching}
+          searchResult={state.searchResult}
+          error={state.error}
+          onScroll={page => term && refetch({ term, page })}
+        />
+      </div>
     </>
   )
 }

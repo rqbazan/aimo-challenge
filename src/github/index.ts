@@ -8,7 +8,9 @@ import {
   Query,
   Cancelable,
   UserProfile
-} from './types'
+} from '../types'
+import getAccessToken from './get-access-token'
+import clearAccessToken from './clear-access-token'
 
 function getPageInfo<T extends { total_count: number }>(
   response: Octokit.Response<T>
@@ -45,12 +47,12 @@ class GithubUserApiImpl implements GithubUserApi {
     this.inMemoryCache = {}
   }
 
-  static getInstance(): GithubUserApi {
+  static getInstance(accessToken?: string): GithubUserApi {
     let { instance } = GithubUserApiImpl
 
     if (!instance) {
       instance = new GithubUserApiImpl({
-        auth: '4b067b6ebe8ff60c41582d73d7c24f38ab6c3f97'
+        auth: accessToken
       })
     }
 
@@ -119,4 +121,6 @@ class GithubUserApiImpl implements GithubUserApi {
   }
 }
 
-export default GithubUserApiImpl.getInstance()
+export { getAccessToken, clearAccessToken }
+
+export default GithubUserApiImpl.getInstance(getAccessToken())

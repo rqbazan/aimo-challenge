@@ -1,17 +1,19 @@
 import React from 'react'
 import Link from 'next/link'
 import InfiniteScroller from 'react-infinite-scroller'
+import { HookError } from '@octokit/rest'
 import get from 'lodash.get'
 import UserCard from './user-card'
 import Loader from './loader'
+import ErrorState from './error-state'
+import Message from './message'
 import { UserSummary, SearchResult } from '../types'
 
 // TODO: add empty state
-// TODO: add error state
 
 interface UsersProps {
   isLoading: boolean
-  className: string
+  error?: HookError
   searchResult?: SearchResult
   onScroll(page: number): void
 }
@@ -23,26 +25,33 @@ const infiniteLoader = (
 )
 
 export default function Users(props: UsersProps) {
-  const { className, isLoading, searchResult, onScroll } = props
+  const { isLoading, error, searchResult, onScroll } = props
+
+  if (error) {
+    return <ErrorState error={error} />
+  }
 
   if (isLoading) {
-    return (
-      <div className={className}>
-        <Loader />
-      </div>
-    )
+    return <Loader />
   }
 
   const dataSource = get(searchResult, 'data', []) as UserSummary[]
   const nextPage = get(searchResult, 'pageInfo.nextPage', 0)
 
   if (!dataSource.length) {
-    return null
+    return (
+      <Message>
+        Your search did not match any Github users{' '}
+        <span role="img" aria-label="sad">
+          😢
+        </span>
+      </Message>
+    )
   }
 
   return (
     <InfiniteScroller
-      className={className}
+      className="w-full flex flex-wrap"
       pageStart={1}
       loadMore={() => onScroll(nextPage)}
       hasMore={!!nextPage}

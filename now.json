@@ -15,5 +15,8 @@
       "src": "next.config.js",
       "use": "@now/next"
     }
-  ]
+  ],
+  "env": {
+    "GITHUB_CLIENT_SECRET": "@github-aimo-challenge-client-secret"
+  }
 }
