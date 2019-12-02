@@ -1,6 +1,7 @@
 export { default as Auth } from './auth'
 export { default as Avatar } from './avatar'
 export { default as Loader } from './loader'
+export { default as Message } from './message'
 export { default as SearchBar } from './search-bar'
 export { default as UserCard } from './user-card'
 export { default as Users } from './users'

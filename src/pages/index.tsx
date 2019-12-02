@@ -4,7 +4,7 @@ import Head from 'next/head'
 import Router from 'next/router'
 import dynamic from 'next/dynamic'
 import get from 'lodash.get'
-import { Users, SearchBar } from '../components'
+import { Users, SearchBar, Message } from '../components'
 import config from '../config'
 import useSearchState, {
   SearchProps as IndexPageProps
@@ -40,12 +40,21 @@ export default function IndexPage({ term, isSearching }: IndexPageProps) {
         </div>
       </header>
       <div className="flex flex-wrap mx-2 pt-40">
-        <Users
-          isLoading={state.isSearching}
-          searchResult={state.searchResult}
-          error={state.error}
-          onScroll={page => term && refetch({ term, page })}
-        />
+        {!state.searchResult ? (
+          <Message>
+            Everything is ready to you{' '}
+            <span role="img" aria-label="searching">
+              🕵️
+            </span>
+          </Message>
+        ) : (
+          <Users
+            isLoading={state.isSearching}
+            searchResult={state.searchResult}
+            error={state.error}
+            onScroll={page => term && refetch({ term, page })}
+          />
+        )}
       </div>
     </>
   )
