@@ -1,5 +1,4 @@
 import React from 'react'
-import truncate from 'lodash.truncate'
 import Avatar from './avatar'
 import { UserSummary } from '../types'
 
@@ -17,8 +16,8 @@ function UserCard({ avatarUrl, username, id }: UserSummary) {
         width={56}
         className="rounded-full border-gray-200 border"
       />
-      <figcaption className="inline-block text-gray-900 text-xs mt-4">
-        {`@${truncate(username, { length: 10 })}`}
+      <figcaption className="inline-block text-gray-900 text-xs mt-4 truncate w-full px-3 text-center">
+        {`@${username}`}
       </figcaption>
     </figure>
   )
