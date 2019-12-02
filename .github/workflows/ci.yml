@@ -7,20 +7,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@master
-  
-    - uses: actions/setup-node@master
-      with:
-        node-version: '12.x'
+      - uses: actions/checkout@master
 
-    - name: Install dependencies
-      run: yarn install
+      - uses: actions/setup-node@master
+        with:
+          node-version: '12.x'
 
-    - name: Lint
-      run: yarn lint .
-    
-    - name: Typecheck
-      run: yarn typecheck
+      - name: Install dependencies
+        run: yarn install
 
-      env:
-        CI: true
+      - name: Static testing
+        run: yarn validate
+
+        env:
+          CI: true
