@@ -22,7 +22,7 @@ function NavItem({ text, emoji, onClick }: NavItemProps) {
     <div
       className="flex items-center justify-center p-3 border-2 border-gray-500 hover:border-gray-900 focus:outline-none focus:border-gray-900"
       role="button"
-      onClick={() => onClick()}
+      onClick={onClick}
       onKeyPress={e => e.key === 'Enter' && onClick()}
       tabIndex={0}
     >
