@@ -16,7 +16,7 @@ function getAsPath(state: string) {
 export default async (req: NowRequest, res: NowResponse) => {
   const options = {
     client_id: config.GITHUB_CLIENT_ID,
-    client_secret: process.env.GITHUB_CLIENT_SECRET,
+    client_secret: config.GITHUB_CLIENT_SECRET,
     code: req.query.code,
     state: req.query.state
   }
