@@ -6,10 +6,8 @@ import get from 'lodash.get'
 import UserCard from './user-card'
 import Loader from './loader'
 import ErrorState from './error-state'
-import Message from './message'
+import EmptyState from './empty-state'
 import { UserSummary, SearchResult } from '../types'
-
-// TODO: add empty state
 
 interface UsersProps {
   isLoading: boolean
@@ -39,14 +37,7 @@ export default function Users(props: UsersProps) {
   const nextPage = get(searchResult, 'pageInfo.nextPage', 0)
 
   if (!dataSource.length) {
-    return (
-      <Message>
-        Your search did not match any Github users{' '}
-        <span role="img" aria-label="sad">
-          😢
-        </span>
-      </Message>
-    )
+    return <EmptyState />
   }
 
   return (

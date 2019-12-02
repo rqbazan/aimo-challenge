@@ -119,7 +119,12 @@ export default function IndexPage({ term, isSearching }: IndexPageProps) {
         <title>AIMO Challenge</title>
       </Head>
       <header className="bg-purple-200 fixed w-full shadow-md p-4 z-10">
-        <h1 className="text-xl mb-2">Github Users</h1>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-xl">Github Users</h1>
+          <div className="text-sm">
+            <Auth githubClientId={config.GITHUB_CLIENT_ID} />
+          </div>
+        </div>
         <div className="flex flex-col">
           <SearchBar
             defaultValue={term}
@@ -128,9 +133,6 @@ export default function IndexPage({ term, isSearching }: IndexPageProps) {
           <span className="text-xs mt-2">
             {get(state, 'searchResult.pageInfo.totalCount', 0)} results
           </span>
-        </div>
-        <div className="absolute top-0 right-0 mt-6 mr-4 text-sm">
-          <Auth githubClientId={config.GITHUB_CLIENT_ID} />
         </div>
       </header>
       <div className="flex flex-wrap mx-2 pt-40">
