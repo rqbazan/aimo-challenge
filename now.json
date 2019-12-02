@@ -17,6 +17,12 @@
     }
   ],
   "env": {
-    "GITHUB_CLIENT_SECRET": "@github-aimo-challenge-client-secret"
+    "GITHUB_CLIENT_SECRET": "@github-aimo-challenge-client-secret",
+    "GITHUB_CLIENT_ID": "@github-aimo-challenge-client-id"
+  },
+  "build": {
+    "env": {
+      "GITHUB_CLIENT_ID": "@github-aimo-challenge-client-id"
+    }
   }
 }

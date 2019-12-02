@@ -3,6 +3,9 @@ const withOffline = require('next-offline')
 
 module.exports = withCSS(
   withOffline({
+    env: {
+      GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID
+    },
     workboxOpts: {
       swDest: 'static/service-worker.js',
       runtimeCaching: [
