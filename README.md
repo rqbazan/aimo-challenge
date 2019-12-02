@@ -10,5 +10,6 @@ This repository contains the solution for [the aimo challenge](https://github.co
 
    - Must contain `GITHUB_CLIENT_SECRET`
 
-2. Install `now` using `yarn global add now`
-3. Use `now dev` instead of `yarn dev`
+2. Set your `GITHUB_CLIENT_ID` in the `config.ts` file
+3. Install `now` globally using `yarn global add now`
+4. Run `now dev` instead of `yarn dev`
