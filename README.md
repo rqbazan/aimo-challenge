@@ -8,11 +8,11 @@ the **Software Engineer Frontend** position of the company.
 
 ### How to run the project?
 
-1. Create a `.env` file.
+1. Create a `.env` file
 
    - Must contain `GITHUB_CLIENT_SECRET` and `GITHUB_CLIENT_ID`
 
-2. Create a `.env.build` file.
+2. Create a `.env.build` file
 
    - Must contain only `GITHUB_CLIENT_ID`
 
