@@ -4,111 +4,15 @@ import Head from 'next/head'
 import Router from 'next/router'
 import dynamic from 'next/dynamic'
 import get from 'lodash.get'
-import uniqBy from 'lodash.uniqby'
-import { HookError } from '@octokit/rest'
 import { Users, SearchBar } from '../components'
-import { SearchResult, Query } from '../types'
-import GithubUser from '../github'
 import config from '../config'
+import useSearchState, {
+  SearchProps as IndexPageProps
+} from '../hooks/use-search-state'
 
 const Auth = dynamic(() => import('../components/auth'), {
   ssr: false
 })
-
-const actionTypes = {
-  SEARCHING: 0,
-  FAILED: 1,
-  SEARCHED: 2,
-  REFETCHED: 3
-}
-
-interface IndexPageState {
-  isSearching: boolean
-  searchResult?: SearchResult
-  error?: HookError
-}
-
-interface IndexPageProps {
-  isSearching: boolean
-  term?: string
-}
-
-type ActionType = keyof typeof actionTypes
-
-type Action = [ActionType, any?]
-
-function reducer(state: IndexPageState, action: Action): IndexPageState {
-  const [type, payload] = action
-
-  switch (type) {
-    case 'SEARCHING': {
-      return {
-        isSearching: true
-      }
-    }
-    case 'SEARCHED': {
-      return {
-        isSearching: false,
-        searchResult: payload
-      }
-    }
-    case 'REFETCHED': {
-      const { data: newUsers } = payload
-      const prevUsers = get(state.searchResult, 'data', [])
-      // TODO: remove if github client was fixed
-      const data = uniqBy(prevUsers.concat(newUsers), 'id')
-
-      return {
-        isSearching: false,
-        searchResult: {
-          data,
-          pageInfo: payload.pageInfo
-        }
-      }
-    }
-    case 'FAILED': {
-      return {
-        isSearching: false,
-        error: payload
-      }
-    }
-    default: {
-      return state
-    }
-  }
-}
-
-function useSearchState({ term, isSearching }: IndexPageProps) {
-  const [state, dispatch] = React.useReducer(reducer, {
-    isSearching
-  })
-
-  async function refetch(query: Query) {
-    try {
-      const { promise } = GithubUser.findAll(query)
-      dispatch(['REFETCHED', await promise])
-    } catch (error) {
-      dispatch(['FAILED', error])
-    }
-  }
-
-  React.useEffect(() => {
-    if (!term) {
-      return undefined
-    }
-
-    const { promise, cancel } = GithubUser.findAll({ term, page: 1 })
-
-    dispatch(['SEARCHING'])
-    promise
-      .then((result: SearchResult) => dispatch(['SEARCHED', result]))
-      .catch(error => dispatch(['FAILED', error]))
-
-    return cancel
-  }, [term])
-
-  return { state, refetch }
-}
 
 export default function IndexPage({ term, isSearching }: IndexPageProps) {
   const { state, refetch } = useSearchState({ term, isSearching })

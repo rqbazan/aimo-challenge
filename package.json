@@ -11,18 +11,22 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --ext ts,tsx",
-    "typecheck": "tsc"
+    "lint": "eslint --ignore-path .gitignore --ext .ts,.tsx .",
+    "check-types": "tsc",
+    "prettier": "prettier --ignore-path .gitignore \"**/*.+(json|ts|tsx)\"",
+    "format": "yarn prettier --write",
+    "check-format": "yarn prettier --list-different",
+    "validate": "npm-run-all --parallel check-types check-format lint build"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
+      "pre-commit": "yarn check-types && lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
-      "yarn lint",
+    "*.{json,ts,tsx}": [
+      "yarn format",
       "git add"
     ]
   },
@@ -71,6 +75,7 @@
     "husky": "^3.1.0",
     "lint-staged": "^9.5.0",
     "next-offline": "^4.0.6",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.19.1",
     "tailwindcss": "^1.1.4",
     "typescript": "^3.7.2"
