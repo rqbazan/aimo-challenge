@@ -1,4 +1,5 @@
 import React from 'react'
+import { useRouter } from 'next/router'
 import { oauthLoginUrl } from '@octokit/oauth-login-url'
 import { getAccessToken, clearAccessToken } from '../github'
 
@@ -12,11 +13,8 @@ function logout(e: React.MouseEvent) {
   window.location.reload()
 }
 
-function getLoginUrl(clientId: string) {
-  return oauthLoginUrl({ clientId }).url
-}
-
-export default React.memo(function Auth({ githubClientId }: AuthProps) {
+function Auth({ githubClientId }: AuthProps) {
+  const router = useRouter()
   const accessToken = getAccessToken()
 
   if (accessToken) {
@@ -27,7 +25,16 @@ export default React.memo(function Auth({ githubClientId }: AuthProps) {
     )
   }
 
-  const loginUrl = getLoginUrl(githubClientId)
+  const { url: loginUrl } = oauthLoginUrl({
+    clientId: githubClientId,
+    state: btoa(
+      `asPath=${router.asPath}; rand=${Math.random()
+        .toString(36)
+        .substr(2)}`
+    )
+  })
 
   return <a href={loginUrl}>Login</a>
-})
+}
+
+export default React.memo(Auth)
