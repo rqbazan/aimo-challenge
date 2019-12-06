@@ -3,6 +3,7 @@ import Link from 'next/link'
 import InfiniteScroller from 'react-infinite-scroller'
 import { HookError } from '@octokit/rest'
 import get from 'lodash.get'
+import Message from './message'
 import UserCard from './user-card'
 import Loader from './loader'
 import ErrorState from './error-state'
@@ -31,6 +32,17 @@ export default function Users(props: UsersProps) {
 
   if (isLoading) {
     return <Loader />
+  }
+
+  if (!searchResult) {
+    return (
+      <Message>
+        Everything is ready to you{' '}
+        <span role="img" aria-label="searching">
+          🕵️
+        </span>
+      </Message>
+    )
   }
 
   const dataSource = get(searchResult, 'data', []) as UserSummary[]
