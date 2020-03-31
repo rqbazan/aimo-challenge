@@ -47,7 +47,7 @@
     "lodash.debounce": "^4.0.8",
     "lodash.get": "^4.4.2",
     "lodash.uniqby": "^4.7.0",
-    "next": "^9.1.4",
+    "next": "^9.3.2",
     "nprogress": "^0.2.0",
     "parse-link-header": "^1.0.1",
     "react": "^16.12.0",
